@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .storages import OverwriteStorage
 
 USER_TYPES = [
     ('business', 'Business'),
@@ -14,7 +15,7 @@ def profile_picture_path(instance, filename):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     type = models.CharField(max_length=8, choices=USER_TYPES, blank=False, null=False)
-    file = models.ImageField(upload_to=profile_picture_path, blank=True)
+    file = models.FileField(upload_to=profile_picture_path, blank=True, null=False, storage=OverwriteStorage())
     location = models.CharField(max_length = 80, blank=True)
     tel = models.CharField(max_length = 30, blank=True)
     description = models.TextField(blank=True)
