@@ -104,9 +104,12 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
         
         # get all User-Data & Update User
         user_data = validated_data.pop('user', {})
-        for attr, value in user_data.items():
-            setattr(instance.user, attr, value)
-        instance.user.save()
+        if user_data:
+            user = instance.user
+            user.first_name = user_data.get('first_name', instance.user.first_name)
+            user.last_name = user_data.get('last_name', instance.user.last_name)
+            user.email = user_data.get('email', instance.user.email)
+            user.save()
 
         # Update Profile
         for attr, value in validated_data.items():
