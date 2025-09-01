@@ -8,7 +8,7 @@ With this API you can manage user authentication, boards, and tasks.
 
 ## Project Structure
 
-> backend/.  
+> backend/<br>  
 > ── app_auth/<br>  
 > ── app_meta/<br>  
 > ── app_offers/<br>  
