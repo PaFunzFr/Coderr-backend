@@ -1,5 +1,5 @@
 from rest_framework import serializers
-# from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate
 from app_auth.models import UserProfile
 from django.contrib.auth.models import User
 from app_auth.models import UserProfile, USER_TYPES
@@ -75,3 +75,25 @@ class UserSerializer(serializers.ModelSerializer):
             return obj.file.name.split('/')[-1]  # only show filename
         return None
 
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username and password:
+            user = authenticate(username=username, password=password)
+            
+            if not user:
+                raise serializers.ValidationError("Invalid email or password")
+            
+            if not user.is_active:
+                raise serializers.ValidationError("User account is disabled")
+            
+            data['user'] = user  # Authenticated user
+            return data
+        else:
+            raise serializers.ValidationError("Must include email and password")

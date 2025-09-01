@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 
 from app_auth.models import UserProfile
-from .serializers import UserSerializer, RegistrationSerializer
+from .serializers import UserSerializer, RegistrationSerializer, LoginSerializer
 
 class ProfileListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
@@ -15,7 +15,27 @@ class ProfileListView(generics.ListAPIView):
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserSerializer, 
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            
+            token, created = Token.objects.get_or_create(user=user)
+            
+            return Response({
+                "token": token.key,
+                "username": user.username,
+                "email": user.email,
+                "user_id": user.id
+            }, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RegistrationView(generics.CreateAPIView):
     permission_classes = [AllowAny]
