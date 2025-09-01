@@ -7,15 +7,36 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 
 from app_auth.models import UserProfile
-from .serializers import UserSerializer, RegistrationSerializer, LoginSerializer
+from .serializers import UserDetailSerializer, RegistrationSerializer, LoginSerializer, BusinessSerializer, CustomerSerializer
 
 class ProfileListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
+
+class BusinessListView(generics.ListAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = BusinessSerializer
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(type="business")
+    
+class CustomerListView(generics.ListAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = CustomerSerializer
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(type="customer")
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserSerializer, 
+    serializer_class = UserDetailSerializer
+
+    # def get_serializer_class(self):
+    #     obj = self.get_object()
+    #     if obj.type == 'business':
+    #         return BusinessSerializer
+    #     else:
+    #         return CustomerSerializer
 
 class LoginView(APIView):
     permission_classes = [AllowAny]

@@ -9,8 +9,10 @@ USER_TYPES = [
 
 def profile_picture_path(instance, filename):
     # File uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
-    ext = filename.split('.')[-1]
-    return f'profile_pictures/user_{instance.user.id}/profile.{ext}' # image name is unique (profile)
+    ext = filename.split('.')[-1].lower()
+    if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
+        return f'profile_pictures/user_{instance.user.id}/profile.{ext}' # image name is unique (profile)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
