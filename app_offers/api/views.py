@@ -10,14 +10,11 @@ from django.db.models import Min
 
 from app_auth.models import UserProfile
 from app_offers.models import Offer, OfferDetail
-from .serializers import OfferSerializer, OfferDetailSerializer, OfferdetailDetailSerializer
+from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSerializer, OfferListSerializer
 
 class OffersListCreateView(generics.ListCreateAPIView):
-    queryset = Offer
-    serializer_class = OfferSerializer
     permission_classes = []
     filter_backends = [DjangoFilterBackend]
-
 
     def get_queryset(self):
         queryset = Offer.objects.all().annotate(
@@ -25,14 +22,34 @@ class OffersListCreateView(generics.ListCreateAPIView):
             min_delivery_time=Min("details__delivery_time_in_days"),
         )
         return queryset
+    
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return OfferCreateUpdateSerializer
+        return OfferListSerializer
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Offer
-    serializer_class = OfferDetailSerializer
     permission_classes = []
 
+    def get_queryset(self):
+        queryset = Offer.objects.all().annotate(
+            min_price=Min("details__price"),
+            min_delivery_time=Min("details__delivery_time_in_days"),
+        )
+        return queryset
+    
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH"]:
+            return OfferCreateUpdateSerializer
+        return OfferListSerializer
+
 class OfferDetailsDetailView(generics.ListAPIView):
-    queryset = OfferDetail
-    serializer_class = OfferdetailDetailSerializer
+    queryset = OfferDetail.objects.all()
+    serializer_class = OfferDetailNestedDetailSerializer
     permission_classes = []
+
+    def get_queryset(self):
+        pk = self.kwargs["pk"]
+        queryset = OfferDetail.objects.filter(pk=pk)
+        return queryset
