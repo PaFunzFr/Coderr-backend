@@ -1,12 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from .storages import OverwriteStorage
+from django.db.models import Min
 
 def offer_picture_path(instance, filename):
     # File uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
     ext = filename.split('.')[-1].lower()
     if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
         return f'offers/offer_{instance.user.id}/logo.{ext}' # image name is unique / always the same (logo)
+
 
 class Offer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -15,6 +17,7 @@ class Offer(models.Model):
     image = models.ImageField(upload_to=offer_picture_path, blank=True, null=True, storage=OverwriteStorage())
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
 class OfferDetail(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='details')
@@ -31,6 +34,7 @@ class OfferDetail(models.Model):
 
 
     class Meta:
+        #no duplicates for offer_type
         constraints = [
             models.UniqueConstraint(
                 fields=['offer', 'offer_type'],
@@ -38,10 +42,3 @@ class OfferDetail(models.Model):
             )
         ]
 
-
-
-# for update / save revisions
-# def save(self, *args, **kwargs):
-#     if self.pk:
-#         self.revisions += 1
-#     super().save(*args, **kwargs)

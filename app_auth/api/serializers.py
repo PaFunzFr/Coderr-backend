@@ -12,7 +12,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'repeated_password', 'type']
+        fields = [
+            'username',
+            'email',
+            'password',
+            'repeated_password',
+            'type'
+        ]
         extra_kwargs = {
             'password': {'write_only': True}, # password write-only
             'username': {'write_only': True},
@@ -51,8 +57,18 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile 
-        fields = ['id', 'username', 'first_name', 'last_name', 'file', 'location', 'tel',
-                'description', 'working_hours','type', ]
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'file', 
+            'location',
+            'tel',
+            'description',
+            'working_hours',
+            'type'
+        ]
         read_only_fields = ['type']
 
     def get_file(self, obj):
@@ -69,7 +85,14 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile 
-        fields = ['id', 'username', 'first_name', 'last_name', 'file', 'type' ]
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'type'
+        ]
         read_only_fields = ['type']
 
     def get_file(self, obj):
@@ -87,8 +110,21 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfile 
-        fields = ['id', 'url','username', 'type', 'first_name', 'last_name', 'email', 'file', 'location', 'tel',
-                'description', 'working_hours', 'created_at']
+        fields = [
+            'id',
+            'url',
+            'username',
+            'type',
+            'first_name',
+            'last_name',
+            'email',
+            'file',
+            'location',
+            'tel',
+            'description',
+            'working_hours',
+            'created_at'
+        ]
         read_only_fields = ['type']
 
     def validate_file(self, value):
