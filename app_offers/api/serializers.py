@@ -78,18 +78,19 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_details(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError("Details must have at least 3 items")
-        
-        all_types = []
-        for detail in value:
-            all_types.append(detail['offer_type'])
-
-        required_types = ['basic', 'standard', 'premium']
-        for required in required_types:
-            if required not in all_types:
-                raise serializers.ValidationError(f"Missing offer_type: {required}")
+        if not self.instance: # only validates for POST Methode (no instance existant)
+            if len(value) < 3:
+                raise serializers.ValidationError("Details must contain exactly 3 items (basic, standard, premium).")
             
+            all_types = []
+            for detail in value:
+                all_types.append(detail['offer_type'])
+
+            required_types = ['basic', 'standard', 'premium']
+            for required in required_types:
+                if required not in all_types:
+                    raise serializers.ValidationError(f"Missing offer_type: {required}")
+                
         return value
 
 
@@ -112,9 +113,10 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
 
         # Update Details
         for single_detail in details_list:
-            detail_id = single_detail.get('id')
-            if detail_id:
-                detail = instance.details.get(id=detail_id)
+            offer_type_to_update = single_detail.get('offer_type')
+            
+            if offer_type_to_update:
+                detail = instance.details.get(offer_type=offer_type_to_update)
 
                 for field in ['title', 'delivery_time_in_days', 'price', 'features']:
                     if field in single_detail:

@@ -15,7 +15,9 @@ from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSer
 
 class OffersListCreateView(generics.ListCreateAPIView):
     permission_classes = []
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    ordering_fields = ['updated_at', 'min_price']
+    search_fields = ['title', 'description']
     filterset_class = OfferFilter
     pagination_class = LargeResultsSetPagination
 
