@@ -105,24 +105,24 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     last_name = serializers.CharField(source='user.last_name', required=False)
     email = serializers.EmailField(source='user.email')
-
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     file = serializers.ImageField(required=False)
 
     class Meta:
         model = UserProfile 
         fields = [
-            'id',
+            'user',
             'url',
             'username',
-            'type',
             'first_name',
             'last_name',
-            'email',
             'file',
             'location',
             'tel',
             'description',
             'working_hours',
+            'type',
+            'email',
             'created_at'
         ]
         read_only_fields = ['type']
