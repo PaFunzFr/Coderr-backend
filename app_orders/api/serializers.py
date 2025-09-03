@@ -3,7 +3,7 @@ from app_orders.models import Order
 from app_offers.models import OfferDetail
 
 class OrdersListCreateSerializer(serializers.ModelSerializer):
-    
+
     # Fields OfferDetail
     title = serializers.CharField(source='offer_detail.title', read_only=True)
     revisions = serializers.IntegerField(source='offer_detail.revisions', read_only=True)
@@ -51,10 +51,11 @@ class OrdersListCreateSerializer(serializers.ModelSerializer):
         if current_user.profile.type != "customer":
             raise serializers.ValidationError("Only Customer can order")
         
-        #create order
+        offer_detail = validated_data["offer_detail"]
+
         new_order = Order.objects.create(
             customer_user=current_user,
-            **validated_data
+            offer_detail=offer_detail
         )
         return new_order
 
@@ -62,4 +63,4 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id']
+        fields = ['status']

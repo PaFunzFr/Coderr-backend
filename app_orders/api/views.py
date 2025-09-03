@@ -1,9 +1,5 @@
 from rest_framework import generics
-from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-
-from django.db.models import Min
 
 from app_orders.models import Order
 from .serializers import OrdersListCreateSerializer, OrderDetailSerializer
@@ -15,3 +11,9 @@ class OrdersListCreateView(generics.ListCreateAPIView):
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
+    http_method_names = ['put', 'patch', 'delete']
+
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        return Response(OrdersListCreateSerializer(instance).data)
