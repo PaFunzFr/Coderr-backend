@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/', include('app_auth.api.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/offers/', include('app_offers.api.urls')),
+    path('api/orders/', include('app_orders.api.urls')),
     path('api/offerdetails/<int:pk>/', OfferDetailsDetailView.as_view(), name='offerdetails-detail'),
 ]

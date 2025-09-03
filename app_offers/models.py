@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from .storages import OverwriteStorage
-from django.db.models import Min
+
 
 def offer_picture_path(instance, filename):
     # File uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
