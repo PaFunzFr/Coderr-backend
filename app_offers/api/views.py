@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,12 +9,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Min
 
 from .paginations import LargeResultsSetPagination
+from .filters import OfferFilter
 from app_offers.models import Offer, OfferDetail
 from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSerializer, OfferListSerializer
 
 class OffersListCreateView(generics.ListCreateAPIView):
     permission_classes = []
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = OfferFilter
     pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
