@@ -8,13 +8,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from django.db.models import Min
 
-from app_auth.models import UserProfile
+from .paginations import LargeResultsSetPagination
 from app_offers.models import Offer, OfferDetail
 from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSerializer, OfferListSerializer
 
 class OffersListCreateView(generics.ListCreateAPIView):
     permission_classes = []
     filter_backends = [DjangoFilterBackend]
+    pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         queryset = Offer.objects.all().annotate(
