@@ -17,12 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from app_offers.api.views import OfferDetailsDetailView
+from app_orders.api.views import OrderCountView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('api/', include('app_auth.api.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/offers/', include('app_offers.api.urls')),
     path('api/orders/', include('app_orders.api.urls')),
+
     path('api/offerdetails/<int:pk>/', OfferDetailsDetailView.as_view(), name='offerdetails-detail'),
+
+    path('api/order-count/<int:business_user_id>/', OrderCountView.as_view(), name='ordercount-inprogress'),
+    path('api/completed-order-count/<int:business_user_id>/', OrderCountView.as_view(), name='ordercount-completed'),
 ]
