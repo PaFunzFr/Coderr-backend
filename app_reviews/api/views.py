@@ -1,5 +1,6 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 from app_reviews.models import Review
 from .serializers import ReviewListCreateSerializer, ReviewUpdateDeleteSerializer
@@ -8,6 +9,9 @@ from .serializers import ReviewListCreateSerializer, ReviewUpdateDeleteSerialize
 class ReviewListCreateView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewListCreateSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    ordering_fields = ['updated_at', 'rating']
+    filterset_fields = ['business_user_id', 'reviewer_id']
 
 class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
