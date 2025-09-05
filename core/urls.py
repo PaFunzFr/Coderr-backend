@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/offers/', include('app_offers.api.urls')),
     path('api/orders/', include('app_orders.api.urls')),
     path('api/reviews/', include('app_reviews.api.urls')),
+    path('api/base-info/', include('app_meta.api.urls')),
 
     path('api/offerdetails/<int:pk>/', OfferDetailsDetailView.as_view(), name='offerdetails-detail'),
 
