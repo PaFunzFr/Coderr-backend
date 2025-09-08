@@ -11,9 +11,16 @@ from .serializers import OrdersListCreateSerializer, OrderDetailSerializer
 from .permissions import IsAssignedBusinessOrAdmin
 
 class OrdersListCreateView(generics.ListCreateAPIView):
-    queryset = Order.objects.all()
     serializer_class = OrdersListCreateSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.profile.type == 'customer':
+            return Order.objects.filter(customer_user=self.request.user)
+        else:
+            return Order.objects.filter(offer_detail__offer__user=user)
+
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
