@@ -14,7 +14,7 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     permission_classes = [IsAuthenticated]
     ordering_fields = ['updated_at', 'rating']
-    filterset_fields = ['business_user_id', 'reviewer_id']
+    filterset_fields = ['business_user', 'reviewer']
 
 class ReviewUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()

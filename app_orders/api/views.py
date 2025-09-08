@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 
 from app_orders.models import Order
@@ -27,8 +28,9 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 class OrderCountView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, business_user_id):
-        profile = UserProfile.objects.get_or_404(user_id=business_user_id)
+        profile = get_object_or_404(UserProfile, user_id=business_user_id)
         
         if profile.type != 'business':
             return Response({"detail": "User is not a business."}, status=status.HTTP_400_BAD_REQUEST)
@@ -40,4 +42,7 @@ class OrderCountView(APIView):
             status=status_filter
         ).count()
 
-        return Response({"order_count": count})
+        if status_filter == 'completed':
+            return Response({"completed_order_count": count})
+        else:
+            return Response({"order_count": count})

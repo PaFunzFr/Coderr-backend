@@ -55,12 +55,7 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         return [IsAssignedBusinessOrAdmin()]
 
 
-class OfferDetailsDetailView(generics.ListAPIView):
+class OfferDetailsDetailView(generics.RetrieveAPIView):
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailNestedDetailSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        pk = self.kwargs["pk"]
-        queryset = OfferDetail.objects.filter(pk=pk)
-        return queryset

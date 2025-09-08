@@ -73,7 +73,8 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     def get_file(self, obj):
         if obj.file:
-            return obj.file.name.split('/')[-1]  # only show filename
+            return obj.file.url
+            #return obj.file.name.split('/')[-1]  # only show filename
         return None
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -97,7 +98,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def get_file(self, obj):
         if obj.file:
-            return obj.file.name.split('/')[-1]  # only show filename
+            #return obj.file.name.split('/')[-1]  # only show filename
+            return obj.file.url
         return None
 
 class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -158,7 +160,8 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
         """Override representation to show only filename for `file`."""
         return_value = super().to_representation(instance)
         if instance.file:
-            return_value['file'] = instance.file.name.split('/')[-1]
+            return_value['file'] = instance.file.url.lstrip('/')
+            #return_value['file'] = instance.file.name.split('/')[-1]
         else:
             return_value['file'] = None
         return return_value

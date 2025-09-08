@@ -1,8 +1,6 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from app_reviews.models import Review
-from app_auth.models import UserProfile
 
 class ReviewListCreateSerializer(serializers.ModelSerializer):
 
@@ -25,6 +23,10 @@ class ReviewListCreateSerializer(serializers.ModelSerializer):
         ]
     
     def validate(self, attrs):
+        request = self.context.get("request")
+        if request and request.method != "POST":
+            return attrs
+
         current_user = self.context["request"].user
         business_user = attrs["business_user"]
 
