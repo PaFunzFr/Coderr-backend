@@ -2,20 +2,23 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 
 from app_auth.models import UserProfile
 from .serializers import UserDetailSerializer, RegistrationSerializer, LoginSerializer, BusinessSerializer, CustomerSerializer
+from .permissions import IsProfileOwnerOrAdmin
 
 class ProfileListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
+    permission_classes = [IsAdminUser]
 
 class BusinessListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = BusinessSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserProfile.objects.filter(type="business")
@@ -23,6 +26,7 @@ class BusinessListView(generics.ListAPIView):
 class CustomerListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserProfile.objects.filter(type="customer")
@@ -30,13 +34,12 @@ class CustomerListView(generics.ListAPIView):
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
+    permission_classes = [IsAuthenticated, IsProfileOwnerOrAdmin]
 
-    # def get_serializer_class(self):
-    #     obj = self.get_object()
-    #     if obj.type == 'business':
-    #         return BusinessSerializer
-    #     else:
-    #         return CustomerSerializer
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        return [IsProfileOwnerOrAdmin()]
 
 class LoginView(APIView):
     permission_classes = [AllowAny]

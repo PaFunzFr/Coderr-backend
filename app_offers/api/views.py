@@ -1,4 +1,5 @@
 from rest_framework import generics, filters
+from rest_framework.permissions import IsAuthenticated, AllowAny, SAFE_METHODS
 from django_filters.rest_framework import DjangoFilterBackend
 
 from django.db.models import Min
@@ -7,6 +8,7 @@ from .paginations import LargeResultsSetPagination
 from .filters import OfferFilter
 from app_offers.models import Offer, OfferDetail
 from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSerializer, OfferListSerializer
+from .permissions import IsAssignedBusinessOrAdmin
 
 
 def add_min_fields_to_offer():
@@ -17,7 +19,6 @@ def add_min_fields_to_offer():
 
 
 class OffersListCreateView(generics.ListCreateAPIView):
-    permission_classes = []
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering_fields = ['updated_at', 'min_price']
     search_fields = ['title', 'description']
@@ -31,10 +32,14 @@ class OffersListCreateView(generics.ListCreateAPIView):
         if self.request.method == "POST":
             return OfferCreateUpdateSerializer
         return OfferListSerializer
+    
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = []
 
     def get_queryset(self):
         return add_min_fields_to_offer()
@@ -43,12 +48,17 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ["PUT", "PATCH"]:
             return OfferCreateUpdateSerializer
         return OfferListSerializer
+    
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        return [IsAssignedBusinessOrAdmin()]
 
 
 class OfferDetailsDetailView(generics.ListAPIView):
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailNestedDetailSerializer
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         pk = self.kwargs["pk"]

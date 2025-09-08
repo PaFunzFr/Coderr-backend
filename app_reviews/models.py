@@ -1,6 +1,5 @@
 from django.db import models
 
-from app_auth.models import UserProfile
 from django.contrib.auth.models import User
 
 class Review(models.Model):
