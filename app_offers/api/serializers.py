@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from app_offers.models import Offer, OfferDetail
+from django.contrib.auth.models import User
 
 
 class OfferDetailNestedReadSerializer(serializers.HyperlinkedModelSerializer):
@@ -27,11 +28,20 @@ class OfferDetailNestedDetailSerializer(serializers.ModelSerializer):
             ]
         read_only_fields = ['revisions', 'offer']
 
+class UserDetailsNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'username'
+        ]
 
 class OfferListSerializer(serializers.ModelSerializer):
     min_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     min_delivery_time = serializers.IntegerField(read_only=True)
     details = OfferDetailNestedReadSerializer(many=True)
+    user_details = UserDetailsNestedSerializer(source="user", read_only=True)
 
     class Meta:
         model = Offer
@@ -45,7 +55,8 @@ class OfferListSerializer(serializers.ModelSerializer):
             "updated_at",
             "details",
             "min_price",
-            "min_delivery_time"
+            "min_delivery_time",
+            'user_details'
         ]
 
 class OfferCreateUpdateSerializer(serializers.ModelSerializer):
@@ -122,12 +133,6 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
                     if field in single_detail:
                         setattr(detail, field, single_detail[field])
 
-                # detail.title = single_detail.get('title', detail.title)
-                # detail.delivery_time_in_days = single_detail.get(
-                #     'delivery_time_in_days', detail.delivery_time_in_days
-                # )
-                # detail.price = single_detail.get('price', detail.price)
-                # detail.features = single_detail.get('features', detail.features)
                 detail.revisions += 1
                 detail.save()
 
@@ -136,9 +141,6 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
 
-        # instance.title = validated_data.get('title', instance.title)
-        # instance.image = validated_data.get('image', instance.image)
-        # instance.description = validated_data.get('description', instance.description)
         instance.save()
 
         return instance
