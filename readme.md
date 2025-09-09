@@ -65,6 +65,7 @@ python manage.py runserver
 - `django-cors-headers`
 - `django-filter`
 - `sqlparse`
+- `drf-spectacular`
 
 ---
 
