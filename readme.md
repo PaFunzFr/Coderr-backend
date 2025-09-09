@@ -33,24 +33,24 @@ With this API you can manage user authentication, boards, and tasks.
 ## Installation
 
 1. **Clone the repository**  
-git clone https://github.com/<your-username>/<repo-name>.git  
-cd <repo-name>  
+```git clone https://github.com/<your-username>/<repo-name>.git```  
+```cd <repo-name>```  
 
 2. **Create a virtual environment**  
-python -m venv env  
-source env/bin/activate   # Windows: env\Scripts\activate  
+```python -m venv env```  
+```source env/bin/activate```   # Windows: env\Scripts\activate  
 
 3. **Install dependencies**  
-pip install -r requirements.txt  
+```pip install -r requirements.txt```  
 
 4. **Run migrations**  
-python manage.py migrate  
+```python manage.py migrate```  
 
 5. **Create a superuser for the admin**  
-python manage.py createsuperuser  
+```python manage.py createsuperuser```  
 
 6. **Start the server**  
-python manage.py runserver  
+```python manage.py runserver```  
 
 > **Note:**  
 > By default, the server runs at [http://127.0.0.1:8000/](http://127.0.0.1:8000/)  

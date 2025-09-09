@@ -25,15 +25,16 @@ class OfferDetailNestedDetailSerializer(serializers.ModelSerializer):
         model = OfferDetail
         fields = [
             'id',
-            'offer',
             'title',
             'revisions',
             'delivery_time_in_days',
+            'price',
             'features',
-            'offer_type',
-            'price'
+            'offer_type'
             ]
-        read_only_fields = ['revisions', 'offer']
+        read_only_fields = [
+            #'revisions',
+            'offer']
 
 class UserDetailsNestedSerializer(serializers.ModelSerializer):
     """
@@ -164,11 +165,11 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
             if offer_type_to_update:
                 detail = instance.details.get(offer_type=offer_type_to_update)
 
-                for field in ['title', 'delivery_time_in_days', 'price', 'features']:
+                for field in ['title', 'delivery_time_in_days', 'price', 'features', 'revisions']:
                     if field in single_detail:
                         setattr(detail, field, single_detail[field])
 
-                detail.revisions += 1
+                # detail.revisions += 1
                 detail.save()
 
         # Update main Offer fields
