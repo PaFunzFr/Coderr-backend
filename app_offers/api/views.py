@@ -8,7 +8,7 @@ from .paginations import LargeResultsSetPagination
 from .filters import OfferFilter
 from app_offers.models import Offer, OfferDetail
 from .serializers import OfferCreateUpdateSerializer, OfferDetailNestedDetailSerializer, OfferListSerializer
-from .permissions import IsAssignedBusinessOrAdmin
+from .permissions import IsAssignedBusinessOrAdmin,IsBusinessUser
 
 
 def add_min_fields_to_offer():
@@ -36,7 +36,7 @@ class OffersListCreateView(generics.ListCreateAPIView):
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAuthenticated(), IsBusinessUser()]
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):

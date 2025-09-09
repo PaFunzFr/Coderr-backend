@@ -10,3 +10,7 @@ class IsAssignedBusinessOrAdmin(permissions.BasePermission):
         is_owner = obj.user == request.user
         is_admin = request.user.is_staff or request.user.is_superuser
         return is_owner or is_admin
+    
+class IsBusinessUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.profile.type == "business"
