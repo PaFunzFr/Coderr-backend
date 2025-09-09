@@ -23,6 +23,7 @@ from .permissions import IsProfileOwnerOrAdmin
     responses=UserDetailSerializer
 )
 class ProfileListView(generics.ListAPIView):
+    """Admin-only: list all user profiles."""
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
     permission_classes = [IsAdminUser]
@@ -33,11 +34,13 @@ class ProfileListView(generics.ListAPIView):
     responses=BusinessSerializer
 )
 class BusinessListView(generics.ListAPIView):
+    """List business user profiles."""
     queryset = UserProfile.objects.all()
     serializer_class = BusinessSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Return only business profiles."""
         return UserProfile.objects.filter(type="business")
 
 
@@ -46,11 +49,13 @@ class BusinessListView(generics.ListAPIView):
     responses=CustomerSerializer
 )
 class CustomerListView(generics.ListAPIView):
+    """List customer user profiles."""
     queryset = UserProfile.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Return only customer profiles."""
         return UserProfile.objects.filter(type="customer")
 
 
@@ -59,11 +64,13 @@ class CustomerListView(generics.ListAPIView):
     responses=UserDetailSerializer
 )
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
+    """Retrieve or update a user profile."""
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
     permission_classes = [IsAuthenticated, IsProfileOwnerOrAdmin]
 
     def get_permissions(self):
+        """Allow read-only access for authenticated users."""
         if self.request.method in SAFE_METHODS:
             return [IsAuthenticated()]
         return [IsProfileOwnerOrAdmin()]
@@ -81,14 +88,15 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     }
 )
 class LoginView(APIView):
+    """Authenticate user and return token with user info."""
     permission_classes = [AllowAny]
     
     def post(self, request):
+        """Handle login POST request."""
         serializer = LoginSerializer(data=request.data)
         
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            
             token, created = Token.objects.get_or_create(user=user)
             
             return Response({
@@ -112,10 +120,12 @@ class LoginView(APIView):
     }
 )
 class RegistrationView(generics.CreateAPIView):
+    """Register new user and return token with user info."""
     permission_classes = [AllowAny]
     serializer_class = RegistrationSerializer
 
     def post(self, request):
+        """Handle registration POST request."""
         serializer = RegistrationSerializer(data=request.data)
 
         data = {}

@@ -6,7 +6,14 @@ from app_auth.models import UserProfile, USER_TYPES
 
 MAX_FILE_SIZE = 2 * 1024 * 1024
 
+
 class RegistrationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration.
+
+    Handles creation of a User and associated UserProfile. 
+    Validates that passwords match and that the email is unique.
+    """
     repeated_password = serializers.CharField(
         write_only=True,
         help_text="Repeat the password for confirmation."
@@ -59,6 +66,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class BusinessSerializer(serializers.ModelSerializer):
+    """
+    Serializer for business user profiles.
+
+    Returns user info (username, first_name, last_name) and profile details.
+    """
     username = serializers.CharField(
         source="user.username",
         read_only=True,
@@ -99,6 +111,11 @@ class BusinessSerializer(serializers.ModelSerializer):
         return None
 
 class CustomerSerializer(serializers.ModelSerializer):
+    """
+    Serializer for customer user profiles.
+
+    Returns user info (username, first_name, last_name) and profile ID.
+    """
     username = serializers.CharField(
         source="user.username",
         read_only=True,
@@ -135,6 +152,12 @@ class CustomerSerializer(serializers.ModelSerializer):
         return None
 
 class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Detailed serializer for user profiles.
+
+    Includes user info (username, first_name, last_name, email) and profile fields.
+    Supports updating user info and profile picture.
+    """
     username = serializers.CharField(
         source="user.username",
         read_only=True,
@@ -179,6 +202,12 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
         return value
         
     def update(self, instance, validated_data):
+        """
+        Update user and profile information.
+
+        Handles updating user fields, profile fields, and file upload.
+        """
+
         # upload image:
         file = validated_data.pop('file', None)
         if file:
@@ -201,7 +230,7 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
         return instance
     
     def to_representation(self, instance):
-        """Override representation to show only filename for `file`."""
+        """Override representation to show correct path to `file` ( 1x / less )."""
         return_value = super().to_representation(instance)
         if instance.file:
             return_value['file'] = instance.file.url.lstrip('/')
@@ -211,10 +240,16 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Serializer for user login.
+
+    Validates username and password, authenticates user.
+    """
     username = serializers.CharField(write_only=True, help_text="Username for Login")
     password = serializers.CharField(write_only=True, help_text="Password for Login")
 
     def validate(self, data):
+        """Authenticate user credentials."""
         username = data.get('username')
         password = data.get('password')
 
@@ -234,6 +269,11 @@ class LoginSerializer(serializers.Serializer):
         
 
 class RegistrationOrLoginResponseSerializer(serializers.Serializer):
+    """
+    Serializer for responses after registration or login. Only used for api/schema/swagger-ui/
+
+    Returns authentication token and basic user info.
+    """
     token = serializers.CharField(help_text="Authentication token")
     username = serializers.CharField(help_text="Username of the logged-in user")
     email = serializers.EmailField(help_text="Email of the logged-in user")
