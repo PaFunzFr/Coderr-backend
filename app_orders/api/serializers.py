@@ -3,6 +3,10 @@ from app_orders.models import Order
 from app_offers.models import OfferDetail
 
 class OrdersListCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing and creating orders.
+    Includes nested fields from related OfferDetail and Offer.
+    """
 
     # Fields OfferDetail
     title = serializers.CharField(source='offer_detail.title', read_only=True)
@@ -46,7 +50,10 @@ class OrdersListCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-
+        """
+        Create a new Order for the current authenticated user.
+        The OfferDetail is required in the request data.
+        """
         current_user = self.context['request'].user
         offer_detail = validated_data["offer_detail"]
 
@@ -57,7 +64,9 @@ class OrdersListCreateSerializer(serializers.ModelSerializer):
         return new_order
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for updating or retrieving the status of an order.
+    """
     class Meta:
         model = Order
         fields = ['status']
