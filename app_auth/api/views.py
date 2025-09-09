@@ -4,17 +4,34 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
+
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from app_auth.models import UserProfile
-from .serializers import UserDetailSerializer, RegistrationSerializer, LoginSerializer, BusinessSerializer, CustomerSerializer
+from .serializers import (
+    UserDetailSerializer,
+    RegistrationSerializer,
+    LoginSerializer,
+    BusinessSerializer,
+    CustomerSerializer,
+    RegistrationOrLoginResponseSerializer
+)
 from .permissions import IsProfileOwnerOrAdmin
 
+@extend_schema(
+    description="List all user profiles. Admin-only endpoint.",
+    responses=UserDetailSerializer
+)
 class ProfileListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
     permission_classes = [IsAdminUser]
 
+
+@extend_schema(
+    description="List all business profiles. Authenticated users only.",
+    responses=BusinessSerializer
+)
 class BusinessListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = BusinessSerializer
@@ -22,7 +39,12 @@ class BusinessListView(generics.ListAPIView):
 
     def get_queryset(self):
         return UserProfile.objects.filter(type="business")
-    
+
+
+@extend_schema(
+    description="List all customer profiles. Authenticated users only.",
+    responses=CustomerSerializer
+)
 class CustomerListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = CustomerSerializer
@@ -31,6 +53,11 @@ class CustomerListView(generics.ListAPIView):
     def get_queryset(self):
         return UserProfile.objects.filter(type="customer")
 
+
+@extend_schema(
+    description="Retrieve or update a user profile. Only the profile owner or admin can update.",
+    responses=UserDetailSerializer
+)
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserDetailSerializer
@@ -41,6 +68,18 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
             return [IsAuthenticated()]
         return [IsProfileOwnerOrAdmin()]
 
+
+@extend_schema(
+    description="Login endpoint. Returns authentication token along with user info.",
+    request=LoginSerializer,
+    responses={
+        200: OpenApiResponse(
+            response=RegistrationOrLoginResponseSerializer,
+            description="Successfully logged in. Returns token, username, email, and user ID."
+        ),
+        400: OpenApiResponse(description="Invalid username or password.")
+    }
+)
 class LoginView(APIView):
     permission_classes = [AllowAny]
     
@@ -61,6 +100,17 @@ class LoginView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(
+    description="Register a new user. Returns authentication token and user info upon success.",
+    request=RegistrationSerializer,
+    responses={
+        201: OpenApiResponse(
+            response=RegistrationOrLoginResponseSerializer,
+            description="User successfully created. Returns token, username, email, and user ID."
+        ),
+        400: OpenApiResponse(description="Invalid input data or validation errors.")
+    }
+)
 class RegistrationView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RegistrationSerializer

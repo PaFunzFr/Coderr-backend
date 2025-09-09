@@ -22,6 +22,8 @@ from app_orders.api.views import OrderCountView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -36,6 +38,11 @@ urlpatterns = [
 
     path('api/order-count/<int:business_user_id>/', OrderCountView.as_view(), name='ordercount-inprogress'),
     path('api/completed-order-count/<int:business_user_id>/', OrderCountView.as_view(), name='ordercount-completed'),
+
+    # API documentation (including Swagger UI)
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
 
 

@@ -7,8 +7,15 @@ from app_auth.models import UserProfile, USER_TYPES
 MAX_FILE_SIZE = 2 * 1024 * 1024
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    repeated_password = serializers.CharField(write_only=True)
-    type = serializers.ChoiceField(choices=USER_TYPES, write_only=True)
+    repeated_password = serializers.CharField(
+        write_only=True,
+        help_text="Repeat the password for confirmation."
+    )
+    type = serializers.ChoiceField(
+        choices=USER_TYPES, 
+        write_only=True,
+        help_text="Select the type of user: 'business' or 'customer'."
+    )
 
     class Meta:
         model = User
@@ -25,11 +32,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
+        """Ensure email is unique."""
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already exists")
         return value
     
     def validate(self, data):
+        """Ensure passwords match."""
         if data['password'] != data['repeated_password']:
             raise serializers.ValidationError("Passwords do not match")
         return data
@@ -48,12 +57,25 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         return user
 
-class BusinessSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source="user.username", read_only=True)
-    first_name = serializers.CharField(source='user.first_name', read_only=True)
-    last_name = serializers.CharField(source='user.last_name', read_only=True)
 
-    file = serializers.SerializerMethodField()
+class BusinessSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+        help_text="User's username"
+    )
+    first_name = serializers.CharField(
+        source='user.first_name',
+        read_only=True,
+        help_text="User's first name"
+    )
+    last_name = serializers.CharField(
+        source='user.last_name',
+        read_only=True,
+        help_text="User's last name"
+    )
+
+    file = serializers.SerializerMethodField(help_text="URL to the profile picture")
 
     class Meta:
         model = UserProfile 
@@ -74,15 +96,26 @@ class BusinessSerializer(serializers.ModelSerializer):
     def get_file(self, obj):
         if obj.file:
             return obj.file.url
-            #return obj.file.name.split('/')[-1]  # only show filename
         return None
 
 class CustomerSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source="user.username", read_only=True)
-    first_name = serializers.CharField(source='user.first_name', read_only=True)
-    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+        help_text="User's username"
+    )
+    first_name = serializers.CharField(
+        source='user.first_name',
+        read_only=True,
+        help_text="User's first name"
+    )
+    last_name = serializers.CharField(
+        source='user.last_name',
+        read_only=True,
+        help_text="User's last name"
+    )
 
-    file = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField(help_text="URL to the profile picture")
 
     class Meta:
         model = UserProfile 
@@ -98,17 +131,28 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def get_file(self, obj):
         if obj.file:
-            #return obj.file.name.split('/')[-1]  # only show filename
             return obj.file.url
         return None
 
 class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
-    username = serializers.CharField(source="user.username", read_only=True)
-    first_name = serializers.CharField(source='user.first_name', required=False)
-    last_name = serializers.CharField(source='user.last_name', required=False)
-    email = serializers.EmailField(source='user.email')
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    file = serializers.ImageField(required=False)
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True,
+        help_text="User's username"
+    )
+    first_name = serializers.CharField(
+        source='user.first_name',
+        required=False,
+        help_text="User's first name"
+    )
+    last_name = serializers.CharField(
+        source='user.last_name',
+        required=False,
+        help_text="User's last name"
+    )
+    email = serializers.EmailField(source='user.email', help_text="User email address")
+    user = serializers.PrimaryKeyRelatedField(read_only=True, help_text="User ID")
+    file = serializers.ImageField(required=False, help_text="Profile picture URL")
 
     class Meta:
         model = UserProfile 
@@ -161,15 +205,14 @@ class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
         return_value = super().to_representation(instance)
         if instance.file:
             return_value['file'] = instance.file.url.lstrip('/')
-            #return_value['file'] = instance.file.name.split('/')[-1]
         else:
             return_value['file'] = None
         return return_value
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(write_only=True)
-    password = serializers.CharField(write_only=True)
+    username = serializers.CharField(write_only=True, help_text="Username for Login")
+    password = serializers.CharField(write_only=True, help_text="Password for Login")
 
     def validate(self, data):
         username = data.get('username')
@@ -188,3 +231,10 @@ class LoginSerializer(serializers.Serializer):
             return data
         else:
             raise serializers.ValidationError("Must include email and password")
+        
+
+class RegistrationOrLoginResponseSerializer(serializers.Serializer):
+    token = serializers.CharField(help_text="Authentication token")
+    username = serializers.CharField(help_text="Username of the logged-in user")
+    email = serializers.EmailField(help_text="Email of the logged-in user")
+    user_id = serializers.IntegerField(help_text="ID of the logged-in user")
