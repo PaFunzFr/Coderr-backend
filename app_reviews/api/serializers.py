@@ -32,8 +32,6 @@ class ReviewListCreateSerializer(serializers.ModelSerializer):
 
         if business_user.profile.type != "business":
             raise serializers.ValidationError("Selected user is not a business.")
-        if current_user.profile.type != "customer":
-            raise serializers.ValidationError("Only customers can write reviews.")
         
         if Review.objects.filter(reviewer=current_user, business_user=business_user).exists():
             raise serializers.ValidationError("You have already reviewed this business.")

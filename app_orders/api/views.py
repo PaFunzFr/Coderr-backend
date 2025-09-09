@@ -48,7 +48,7 @@ class OrderCountView(APIView):
         profile = get_object_or_404(UserProfile, user_id=business_user_id)
         
         if profile.type != 'business':
-            return Response({"detail": "User is not a business."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Business user not found"}, status=status.HTTP_404_NOT_FOUND)
         
         status_filter = 'completed' if 'completed' in request.path else 'in_progress'
 
