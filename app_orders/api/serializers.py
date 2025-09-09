@@ -48,9 +48,6 @@ class OrdersListCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         current_user = self.context['request'].user
-        if current_user.profile.type != "customer":
-            raise serializers.ValidationError("Only Customer can order")
-        
         offer_detail = validated_data["offer_detail"]
 
         new_order = Order.objects.create(

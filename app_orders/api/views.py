@@ -1,19 +1,18 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 
 
 from app_orders.models import Order
 from app_auth.models import UserProfile
 from .serializers import OrdersListCreateSerializer, OrderDetailSerializer
-from .permissions import IsAssignedBusinessOrAdmin
+from .permissions import IsAssignedBusinessOrAdmin, IsCustomerUser
 
 class OrdersListCreateView(generics.ListCreateAPIView):
 
     serializer_class = OrdersListCreateSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -25,6 +24,11 @@ class OrdersListCreateView(generics.ListCreateAPIView):
         else:
             return Order.objects.all()
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        else:
+            return [IsAuthenticated(), IsCustomerUser()]
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
