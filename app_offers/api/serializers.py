@@ -128,7 +128,12 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
             for required in required_types:
                 if required not in all_types:
                     raise serializers.ValidationError(f"Missing offer_type: {required}")
-                
+        else: # for update, offer_type must bet set
+            for detail in value:
+                if "offer_type" not in detail:
+                    raise serializers.ValidationError(
+                        {"offer_type": "offer_type as identifier required."}
+                    )
         return value
 
 

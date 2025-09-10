@@ -86,13 +86,14 @@ class BusinessSerializer(serializers.ModelSerializer):
         read_only=True,
         help_text="User's last name"
     )
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     file = serializers.SerializerMethodField(help_text="URL to the profile picture")
 
     class Meta:
         model = UserProfile 
         fields = [
-            'id',
+            'user',
             'username',
             'first_name',
             'last_name',
@@ -131,13 +132,14 @@ class CustomerSerializer(serializers.ModelSerializer):
         read_only=True,
         help_text="User's last name"
     )
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     file = serializers.SerializerMethodField(help_text="URL to the profile picture")
 
     class Meta:
         model = UserProfile 
         fields = [
-            'id',
+            'user',
             'username',
             'first_name',
             'last_name',
