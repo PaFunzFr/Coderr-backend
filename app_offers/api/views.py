@@ -88,7 +88,7 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         """Assign permissions based on request method."""
         if self.request.method in SAFE_METHODS:
             return [IsAuthenticated()]
-        return [IsAssignedBusinessOrAdmin()]
+        return [IsAuthenticated(), IsAssignedBusinessOrAdmin()]
 
 
 @extend_schema(
