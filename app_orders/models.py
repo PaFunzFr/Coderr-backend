@@ -4,6 +4,11 @@ from django.contrib.auth.models import User
 from app_offers.models import OfferDetail
 
 class Order(models.Model):
+    """
+    Represents a customer's order for a specific offer detail.
+
+    Tracks the status, creation, and update timestamps.
+    """
     customer_user = models.ForeignKey(User, on_delete=models.CASCADE)
     offer_detail = models.ForeignKey(OfferDetail, on_delete=models.CASCADE)
     status = models.CharField(max_length=12, default='in_progress', choices=[

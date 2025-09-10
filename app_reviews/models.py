@@ -3,6 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Review(models.Model):
+    """
+    Represents a review given by a user (reviewer) to a business user.
+
+    Includes a rating (1-5), optional description, and timestamps.
+    """
     business_user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

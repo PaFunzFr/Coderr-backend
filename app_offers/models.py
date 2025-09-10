@@ -4,13 +4,23 @@ from .storages import OverwriteStorage
 
 
 def offer_picture_path(instance, filename):
-    # File uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
+    """
+    Generate the upload path for an offer picture.
+
+    The file is saved under:
+        MEDIA_ROOT/offers/offer_<user_id>/logo.<ext>
+
+    - The filename is normalized to 'logo.<extension>' to ensure uniqueness.
+    - Only image files with valid extensions are supported.
+
+    """
     ext = filename.split('.')[-1].lower()
     if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
-        return f'offers/offer_{instance.user.id}/logo.{ext}' # image name is unique / always the same (logo)
+        return f'offers/offer_{instance.user.id}/logo.{ext}'
 
 
 class Offer(models.Model):
+    """Represents an offer created by a user, including title, description, and logo image."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     description = models.TextField()
@@ -20,6 +30,12 @@ class Offer(models.Model):
 
 
 class OfferDetail(models.Model):
+    """
+    Detailed configuration of an offer.
+
+    Includes type (basic, standard, premium), price,
+    delivery time, features, and revision tracking.
+    """
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='details')
     title = models.CharField(max_length= 150)
     revisions = models.PositiveIntegerField(default=0)
@@ -34,7 +50,7 @@ class OfferDetail(models.Model):
 
 
     class Meta:
-        #no duplicates for offer_type
+        """Ensure each offer has only one detail per offer_type."""
         constraints = [
             models.UniqueConstraint(
                 fields=['offer', 'offer_type'],

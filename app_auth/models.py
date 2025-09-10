@@ -8,13 +8,31 @@ USER_TYPES = [
 ]
 
 def profile_picture_path(instance, filename):
-    # File uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
+    """
+    Generate the upload path for a user's profile picture.
+
+    The file is saved under:
+        MEDIA_ROOT/profile_pictures/user_<id>/profile.<ext>
+
+    - The filename is normalized to 'profile.<extension>' to ensure uniqueness.
+    - Only image files with valid extensions are supported.
+
+    Args:
+        instance (UserProfile): The profile instance associated with the user.
+        filename (str): The original name of the uploaded file.
+    """
     ext = filename.split('.')[-1].lower()
     if filename.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
-        return f'profile_pictures/user_{instance.user.id}/profile.{ext}' # image name is unique (profile)
+        return f'profile_pictures/user_{instance.user.id}/profile.{ext}'
 
 
 class UserProfile(models.Model):
+    """
+    Extended profile model linked to User.
+
+    Stores profile picture, contact info, description,
+    and optional working hours for both business and customer users.
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     type = models.CharField(max_length=8, choices=USER_TYPES, blank=False, null=False)
     file = models.FileField(upload_to=profile_picture_path, blank=True, null=False, storage=OverwriteStorage())
