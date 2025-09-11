@@ -68,7 +68,7 @@ class OfferCreateTests(APITestCase):
     # create as business (valid)
     def test_create_offer_as_business(self):
         self.authenticate_user("business")
-        url = "http://127.0.0.1:8000/api/offers/"
+        url = reverse("offers-list")
         payload = {
             "title": "New Offer",
             "description": "Desc",
