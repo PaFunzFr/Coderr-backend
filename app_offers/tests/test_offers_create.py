@@ -7,7 +7,18 @@ from rest_framework.authtoken.models import Token
 
 from app_auth.models import UserProfile
 
+from django.test import override_settings
 
+@override_settings(
+    REST_FRAMEWORK={
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+        ],
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated'
+        ]
+    }
+)
 class OfferCreateTests(APITestCase):
 
     def setUp(self):
@@ -48,7 +59,6 @@ class OfferCreateTests(APITestCase):
             token = self.customer_token
         else:
             raise ValueError("Unknown user type")
-        print(token)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
 
@@ -57,9 +67,8 @@ class OfferCreateTests(APITestCase):
 
     # create as business (valid)
     def test_create_offer_as_business(self):
-        
         self.authenticate_user("business")
-        url = reverse("offers-list")
+        url = "http://127.0.0.1:8000/api/offers/"
         payload = {
             "title": "New Offer",
             "description": "Desc",
