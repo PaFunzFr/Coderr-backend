@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from app_auth.models import UserProfile
 
 
-class OfferCreateTests(APITestCase):
+class OfferTests(APITestCase):
 
     def setUp(self):
         """ Create Users"""
@@ -51,18 +51,21 @@ class OfferCreateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
 
-    """ TESTS OFFERS CREATE """
-    """ ------------------- """
+    """ TESTS OFFERS """
+    """ ------------ """
 
     # get offer_list (valid) - do min_price & min_delivery_time exist?
     def test_get_offer_list(self):
         url = reverse("offers-list")
         response = self.client.get(url, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)  # Pagination active?
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["min_price"], "50.00")
         self.assertEqual(response.data["results"][0]["min_delivery_time"], 1)
+        self.assertEqual(response.data["results"][0]["user"], self.business_user.id) # valid owner?
+
 
     # create as business (valid)
     def test_create_offer_as_business(self):
@@ -78,8 +81,14 @@ class OfferCreateTests(APITestCase):
             ]
         }
         response = self.client.post(url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Offer.objects.count(), 2)
+
+        new_offer = Offer.objects.latest("id")
+        self.assertEqual(new_offer.user, self.business_user)
+        self.assertEqual(new_offer.details.count(), 3)
+
 
     # create as customer (invalid)
     def test_create_offer_as_customer_forbidden(self):
@@ -95,7 +104,10 @@ class OfferCreateTests(APITestCase):
             ]
         }
         response = self.client.post(url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Offer.objects.count(), 1) # nothing created
+
 
     # create with less than 3 details (invalid)
     def test_create_offer_with_less_than_3_details_fails(self):
@@ -110,11 +122,14 @@ class OfferCreateTests(APITestCase):
             ]
         }
         response = self.client.post(url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "Details must contain exactly 3 items (basic, standard, premium).",
             str(response.data)
         )
+        self.assertEqual(Offer.objects.count(), 1)
+
 
     # create with missing offer_type (invalid)
     def test_create_offer_missing_offer_type_fails(self):
@@ -130,8 +145,11 @@ class OfferCreateTests(APITestCase):
             ]
         }
         response = self.client.post(url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("This field is required.",str(response.data))
+        self.assertEqual(Offer.objects.count(), 1)
+
 
     # patch with invalid offerdetail offer_type (invalid)
     def test_patch_offer_invalid_offer_type_fails(self):
@@ -143,12 +161,16 @@ class OfferCreateTests(APITestCase):
             ]
         }
         response = self.client.patch(url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("not a valid choice",str(response.data))
+
 
     # delete offer by its owner (valid)
     def test_delete_offer_by_owner(self):
         self.authenticate_user("business")
         url =  reverse("offer-detail", args=[self.offer.pk])
         response = self.client.delete(url, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Offer.objects.filter(pk=self.offer.pk).exists()) 
