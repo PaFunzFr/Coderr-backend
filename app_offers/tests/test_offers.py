@@ -54,7 +54,7 @@ class OfferTests(APITestCase):
     """ TESTS OFFERS """
     """ ------------ """
 
-    # get offer_list (valid) - do min_price & min_delivery_time exist?
+    # GET offer_list (valid) - do min_price & min_delivery_time exist?
     def test_get_offer_list(self):
         url = reverse("offers-list")
         response = self.client.get(url, format="json")
@@ -67,7 +67,7 @@ class OfferTests(APITestCase):
         self.assertEqual(response.data["results"][0]["user"], self.business_user.id) # valid owner?
 
 
-    # create as business (valid)
+    # CREATE as business (valid)
     def test_create_offer_as_business(self):
         self.authenticate_user("business")
         url = reverse("offers-list")
@@ -90,7 +90,7 @@ class OfferTests(APITestCase):
         self.assertEqual(new_offer.details.count(), 3)
 
 
-    # create as customer (invalid)
+    # CREATE as customer (invalid)
     def test_create_offer_as_customer_forbidden(self):
         self.authenticate_user("customer")
         url = reverse("offers-list")
@@ -109,7 +109,7 @@ class OfferTests(APITestCase):
         self.assertEqual(Offer.objects.count(), 1) # nothing created
 
 
-    # create with less than 3 details (invalid)
+    # CREATE with less than 3 details (invalid)
     def test_create_offer_with_less_than_3_details_fails(self):
         self.authenticate_user("business")
         url = reverse("offers-list")
@@ -131,7 +131,7 @@ class OfferTests(APITestCase):
         self.assertEqual(Offer.objects.count(), 1)
 
 
-    # create with missing offer_type (invalid)
+    # CREATE with missing offer_type (invalid)
     def test_create_offer_missing_offer_type_fails(self):
         self.authenticate_user("business")
         url = reverse("offers-list")
@@ -151,7 +151,7 @@ class OfferTests(APITestCase):
         self.assertEqual(Offer.objects.count(), 1)
 
 
-    # patch with invalid offerdetail offer_type (invalid)
+    # PATCH with invalid offerdetail offer_type (invalid)
     def test_patch_offer_invalid_offer_type_fails(self):
         self.authenticate_user("business")
         url =  reverse("offer-detail", args=[self.offer.pk])
@@ -166,7 +166,7 @@ class OfferTests(APITestCase):
         self.assertIn("not a valid choice",str(response.data))
 
 
-    # delete offer by its owner (valid)
+    # DELETE offer by its owner (valid)
     def test_delete_offer_by_owner(self):
         self.authenticate_user("business")
         url =  reverse("offer-detail", args=[self.offer.pk])

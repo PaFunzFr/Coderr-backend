@@ -58,7 +58,7 @@ class OrderTests(APITestCase):
     """ TESTS ORDERS """
     """ ------------ """
 
-    # get orders list (valid) - first entry is premium offer
+    # GET orders list (valid) - first entry is premium offer
     def test_get_order_list(self):
         self.authenticate_user("customer")
         url = reverse("orders-list")
@@ -70,7 +70,7 @@ class OrderTests(APITestCase):
         self.assertEqual(response.data[0]['customer_user'], self.customer_user.id)
 
 
-    # create as customer (valid)
+    # CREATE as customer (valid)
     def test_create_order_as_customer(self):
         self.authenticate_user("customer")
         url = reverse("orders-list")
@@ -86,7 +86,7 @@ class OrderTests(APITestCase):
         self.assertEqual(response.data['status'], "in_progress")  # default set?
 
 
-    # create as business (invalid)
+    # CREATE as business (invalid)
     def test_create_order_as_business_fails(self):
         self.authenticate_user("business")
         url = reverse("orders-list")
@@ -99,7 +99,7 @@ class OrderTests(APITestCase):
         self.assertEqual(Order.objects.count(), 1) # nothing created
 
 
-    # patch as assigned business (valid)
+    # PATCH as assigned business (valid)
     def test_patch_order_as_business(self):
         self.authenticate_user("business")
         url = reverse("order-detail", args=[self.order.pk])
@@ -113,7 +113,7 @@ class OrderTests(APITestCase):
         self.assertEqual(self.order.status, "completed")  # check db
 
 
-    # patch as assigned business (valid)
+    # PATCH as assigned business (valid)
     def test_patch_order_invalid_status_fails(self):
         self.authenticate_user("business")
         url = reverse("order-detail", args=[self.order.pk])
@@ -126,7 +126,7 @@ class OrderTests(APITestCase):
         self.assertIn("not a valid choice", str(response.data)) 
 
 
-    # patch as customer (invalid)
+    # PATCH as customer (invalid)
     def test_patch_order_as_customer_fails(self):
         self.authenticate_user("customer")
         url = reverse("order-detail", args=[self.order.pk])
@@ -139,7 +139,7 @@ class OrderTests(APITestCase):
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, "in_progress") # status did not change
 
-    # patch order, that does no exist (invalid)
+    # PATCH order, that does no exist (invalid)
     def test_patch_order_not_existing_fails(self):
         self.authenticate_user("business")
         pk = 44
@@ -152,7 +152,7 @@ class OrderTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    # delete order as business (owner) (valid)
+    # DELETE order as business (owner) (valid)
     def test_delete_order_by_owner(self):
         self.authenticate_user("business")
         url = reverse("order-detail", args=[self.order.pk])
@@ -162,7 +162,7 @@ class OrderTests(APITestCase):
         self.assertFalse(Order.objects.filter(pk=self.order.pk).exists()) # deleted?
 
 
-    # delete order as customer / other than owner (invalid)
+    # DELETE order as customer / other than owner (invalid)
     def test_delete_order_by_other_fails(self):
         self.authenticate_user("customer")
         url = reverse("order-detail", args=[self.order.pk])
