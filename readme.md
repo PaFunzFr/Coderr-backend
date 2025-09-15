@@ -66,6 +66,7 @@ With this API you can manage user authentication, boards, and tasks.
 - `django-filter`
 - `sqlparse`
 - `drf-spectacular`
+- `pytest-django`
 
 ---
 

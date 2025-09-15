@@ -53,7 +53,6 @@ class OfferTests(APITestCase):
 
     """ TESTS OFFERS """
     """ ------------ """
-
     # GET offer_list (valid) - do min_price & min_delivery_time exist?
     def test_get_offer_list(self):
         url = reverse("offers-list")

@@ -41,7 +41,6 @@ class ReviewTests(APITestCase):
 
     """ TESTS REVIEWS """
     """ ------------- """
-
     # GET review list (valid)
     def test_get_review_list(self):
         self.authenticate_user("customer")
