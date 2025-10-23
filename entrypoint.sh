@@ -11,6 +11,7 @@ python manage.py collectstatic --noinput
 echo "[entrypoint] Ensuring Django superuser exists"
 python manage.py shell <<'PYCODE'
 import os
+from django.db import transaction
 from django.contrib.auth import get_user_model
 from app_auth.models import UserProfile
 User = get_user_model()
