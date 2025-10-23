@@ -23,6 +23,7 @@ guest_password = os.environ.get('DJANGO_GUEST_PASSWORD', '123456')
 if not User.objects.filter(username=username).exists():
     print(f"[entrypoint] Creating superuser '{username}'")
     User.objects.create_superuser(username=username, email=email, password=password)
+    UserProfile.objects.create(user=admin_user, type="business", file="")
     print(f"[entrypoint] Superuser '{username}' created")
 else:
     print(f"[entrypoint] Superuser '{username}' already exists")
@@ -41,7 +42,7 @@ for g in guests:
         user.is_staff = False
         user.is_superuser = False
         user.save()
-        UserProfile.objects.create(user=user, type=g["type"])
+        UserProfile.objects.create(user=user, type=g["type"], file="")
         print(f"[entrypoint] Guest user '{g['username']}' created")
     else:
         print(f"[entrypoint] Guest user '{g['username']}' already exists")
