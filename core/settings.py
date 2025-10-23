@@ -27,9 +27,10 @@ MEDIA_URL = '/media/'
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='localhost').split(',')]
-
+CSRF_TRUSTED_ORIGINS = [h.strip() for h in config('TRUSTED_ORIGINS', default='localhost').split(',')]
+CORS_ALLOWED_ORIGINS = [h.strip() for h in config('CORS_ALLOWED_ORIGINS', default='localhost').split(',')]
 
 # Application definition
 
@@ -82,19 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:4200',
-    'http://127.0.0.1:4200',
-    'http://127.0.0.1:5500',
-    'http://127.0.0.1:5501',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4200',
-    'http://127.0.0.1:4200',
-    'http://127.0.0.1:5500',
-    'http://127.0.0.1:5501',
-]
 
 
 # Database
@@ -167,3 +155,6 @@ REST_FRAMEWORK = {
 }
 
 FILTERS_STRICTNESS = "raise"
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
