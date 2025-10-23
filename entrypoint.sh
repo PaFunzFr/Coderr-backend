@@ -21,13 +21,13 @@ guest_password = os.environ.get('DJANGO_GUEST_PASSWORD', '123456')
 
 # Admin
 if not User.objects.filter(username=su_username).exists():
-    print(f"[entrypoint] Creating superuser '{username}'")
+    print(f"[entrypoint] Creating superuser '{su_username}'")
     su = User.objects.create_superuser(username=su_username, email=su_email, password=su_password)
     if not hasattr(su, "profile"):
         UserProfile.objects.create(user=su, type="business")
-    print(f"[entrypoint] Superuser '{username}' created")
+    print(f"[entrypoint] Superuser '{su_username}' created")
 else:
-    print(f"[entrypoint] Superuser '{username}' already exists")
+    print(f"[entrypoint] Superuser '{su_username}' already exists")
 
 # Guest-Logins
 guests = [
