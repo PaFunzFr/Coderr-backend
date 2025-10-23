@@ -1,0 +1,16 @@
+version: '3.9'
+networks:
+  webnet:
+    external: true
+services:
+  coderr_web:
+    build: .
+    image: coderr:latest
+    container_name: coderr_web
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - webnet
+    expose:
+      - "8000"
