@@ -12,6 +12,7 @@ echo "[entrypoint] Ensuring Django superuser exists"
 python manage.py shell <<'PYCODE'
 import os
 from django.contrib.auth import get_user_model
+from app_auth.models import UserProfile
 User = get_user_model()
 username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
 email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
