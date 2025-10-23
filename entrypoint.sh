@@ -28,8 +28,8 @@ else:
 
 # Guest-Logins
 guests = [
-    {"username": "Guest Customer", "email": "guest.customer@example.com", "password": guest_password, type="customer"},
-    {"username": "Guest Business", "email": "guest.business@example.com", "password": guest_password, type="business"},
+    {"username": "Guest Customer", "email": "guest.customer@example.com", "password": guest_password, type: "customer"},
+    {"username": "Guest Business", "email": "guest.business@example.com", "password": guest_password, type: "business"},
 ]
 
 for g in guests:
