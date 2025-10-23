@@ -1,7 +1,5 @@
 version: '3.9'
-networks:
-  webnet:
-    external: true
+
 services:
   coderr_web:
     build: .
