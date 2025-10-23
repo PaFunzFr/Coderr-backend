@@ -28,8 +28,8 @@ else:
 
 # Guest-Logins
 guests = [
-    {"username": "Guest Customer", "email": "guest.customer@example.com", "password": guest_password},
-    {"username": "Guest Business", "email": "guest.business@example.com", "password": guest_password},
+    {"username": "Guest Customer", "email": "guest.customer@example.com", "password": guest_password, type="customer"},
+    {"username": "Guest Business", "email": "guest.business@example.com", "password": guest_password, type="business"},
 ]
 
 for g in guests:
@@ -40,6 +40,7 @@ for g in guests:
         user.is_staff = False
         user.is_superuser = False
         user.save()
+        UserProfile.objects.create(user=user, type=g["type"])
         print(f"[entrypoint] Guest user '{g['username']}' created")
     else:
         print(f"[entrypoint] Guest user '{g['username']}' already exists")
